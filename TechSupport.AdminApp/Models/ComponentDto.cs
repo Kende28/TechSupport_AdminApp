@@ -8,10 +8,9 @@ namespace TechSupport.AdminApp.Models
 {
 	public class ComponentDto
 	{
-		public int id { get; set; }
-		public string name { get; set; }
-		public string brand { get; set; }
-		public string category { get; set; }
-		public int price { get; set; }
+		public int PartId { get; set; }
+		public string PartName { get; set; }
+		public string? PartDescription { get; set; }
+		public bool PartVisible { get; set; }
 	}
 }

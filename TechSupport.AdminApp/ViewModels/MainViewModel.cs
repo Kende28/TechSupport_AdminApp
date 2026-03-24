@@ -11,7 +11,7 @@ namespace TechSupport.AdminApp.ViewModels
 {
 	public class MainViewModel : INotifyPropertyChanged
 	{
-		private readonly ComponentApiClient _api = new();
+		private readonly PartApiClient _api = new();
 
 		public MainViewModel()
 		{
@@ -33,16 +33,13 @@ namespace TechSupport.AdminApp.ViewModels
 		}
 
 		private string _name;
-		public string Name { get => _name; set { _name = value; Notify(); } }
+		public string PartName { get => _name; set { _name = value; Notify(); } }
 
-		private string _brand;
-		public string Brand { get => _brand; set { _brand = value; Notify(); } }
+		private string _description;
+		public string PartDescription { get => _description; set { _description = value; Notify(); } }
 
-		private string _category;
-		public string Category { get => _category; set { _category = value; Notify(); } }
-
-		private int _price;
-		public int Price { get => _price; set { _price = value; Notify(); } }
+		private bool _visible;
+		public bool PartVisible { get => _visible; set { _visible = value; Notify(); } }
 
 		public ICommand LoadCommand { get; }
 		public ICommand AddCommand { get; }
@@ -61,10 +58,9 @@ namespace TechSupport.AdminApp.ViewModels
 		{
 			var dto = new ComponentDto
 			{
-				name = Name,
-				brand = Brand,
-				category = Category,
-				price = Price
+				PartName = PartName,
+				PartDescription = PartDescription,
+				PartVisible = PartVisible,
 			};
 
 			await _api.CreateAsync(dto);
@@ -76,12 +72,11 @@ namespace TechSupport.AdminApp.ViewModels
 		{
 			if (SelectedComponent == null) return;
 
-			SelectedComponent.name = Name;
-			SelectedComponent.brand = Brand;
-			SelectedComponent.category = Category;
-			SelectedComponent.price = Price;
+			SelectedComponent.PartName = PartName;
+			SelectedComponent.PartDescription = PartDescription;
+			SelectedComponent.PartVisible = PartVisible;
 
-			await _api.UpdateAsync(SelectedComponent.id, SelectedComponent);
+			await _api.UpdateAsync(SelectedComponent.PartId, SelectedComponent);
 			await LoadAsync();
 		}
 
@@ -89,7 +84,7 @@ namespace TechSupport.AdminApp.ViewModels
 		{
 			if (SelectedComponent == null) return;
 
-			await _api.DeleteAsync(SelectedComponent.id);
+			await _api.DeleteAsync(SelectedComponent.PartId);
 			SelectedComponent = null;
 			await LoadAsync();
 			ClearFields();
@@ -97,20 +92,18 @@ namespace TechSupport.AdminApp.ViewModels
 
 		private void ClearFields()
 		{
-			Name = string.Empty;
-			Brand = string.Empty;
-			Category = null;
-			Price = 0;
+			PartName = string.Empty;
+			PartDescription = string.Empty;
+			PartVisible = false;
 		}
 
 		private void PopulateFieldsFromSelected()
 		{
 			if (SelectedComponent != null)
 			{
-				Name = SelectedComponent.name;
-				Brand = SelectedComponent.brand;
-				Category = SelectedComponent.category;
-				Price = SelectedComponent.price;
+				PartName = SelectedComponent.PartName;
+				PartDescription = SelectedComponent.PartDescription;
+				PartVisible = SelectedComponent.PartVisible;
 			}
 		}
 

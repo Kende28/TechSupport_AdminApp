@@ -20,6 +20,7 @@ namespace TechSupport.AdminApp.ViewModels
 			LoginCommand = new RelayCommand(Login);
 		}
 
+		//🎵Fuck this shit I'm out🎵
 		private void Login(object obj)
 		{
 			// DEMO LOGIN!!!!
