@@ -2,6 +2,8 @@
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
+using TechSupport.AdminApp.Models;
+using TechSupport.AdminApp.Services;
 
 namespace TechSupport.AdminApp.ViewModels
 {
@@ -24,7 +26,7 @@ namespace TechSupport.AdminApp.ViewModels
 		private void Login(object obj)
 		{
 			// DEMO LOGIN!!!!
-			if (Username == "admin" && Password == "1234")
+			if ( Username == "admin" && Password == "1234")
 			{
 				MessageBox.Show("Login successful!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
 
