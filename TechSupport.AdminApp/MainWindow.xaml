@@ -17,6 +17,9 @@
                        FontSize="16"
                        Margin="0,0,0,10"/>
 
+			<TextBlock Text="PartId"/>
+			<TextBox Text="{Binding PartId}" IsReadOnly="True" Margin="0,0,0,8"/>
+
 			<TextBlock Text="PartName"/>
 			<TextBox Text="{Binding PartName, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,8"/>
 
@@ -24,13 +27,14 @@
 			<TextBox Text="{Binding PartDescription, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,8"/>
 
 			<TextBlock Text="PartVisible"/>
-			<CheckBox Command="{Binding PartVisible, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,8"/>
+			<CheckBox IsChecked="{Binding PartVisible, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,8"/>
 
 			<StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-				<Button Content="Add" Command="{Binding AddCommand}" Width="80" Margin="0,0,8,0"/>
+				<Button Content="Create" Command="{Binding CreateCommand}" Width="80" Margin="0,0,8,0"/>
 				<Button Content="Update" Command="{Binding UpdateCommand}" Width="80" Margin="0,0,8,0"/>
 				<Button Content="Delete" Command="{Binding DeleteCommand}" Width="80" Margin="0,0,8,0"/>
-				<Button Content="Load" Command="{Binding LoadCommand}" Width="80"/>
+				<Button Content="Clear" Command="{Binding ClearCommand}" Width="80" Margin="0,0,8,0"/>
+				<Button Content="Read" Command="{Binding ReadCommand}" Width="80"/>
 			</StackPanel>
 		</StackPanel>
 

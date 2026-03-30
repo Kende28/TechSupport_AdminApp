@@ -17,10 +17,11 @@ namespace TechSupport.AdminApp.ViewModels
 		{
 			Components = new ObservableCollection<ComponentDto>();
 
-			LoadCommand = new AsyncRelayCommand(LoadAsync);
-			AddCommand = new AsyncRelayCommand(AddAsync);
+			ReadCommand = new AsyncRelayCommand(ReadAsync);
+			CreateCommand = new AsyncRelayCommand(CreateAsync);
 			UpdateCommand = new AsyncRelayCommand(UpdateAsync);
 			DeleteCommand = new AsyncRelayCommand(DeleteSelectedAsync);
+			ClearCommand = new AsyncRelayCommand(ClearAsync);
 		}
 
 		public ObservableCollection<ComponentDto> Components { get; }
@@ -32,6 +33,9 @@ namespace TechSupport.AdminApp.ViewModels
 			set { _selectedComponent = value; Notify(); PopulateFieldsFromSelected(); }
 		}
 
+		private int _id;
+		public int PartId { get => _id; set { _id = value; Notify(); } }
+
 		private string _name;
 		public string PartName { get => _name; set { _name = value; Notify(); } }
 
@@ -41,12 +45,13 @@ namespace TechSupport.AdminApp.ViewModels
 		private bool _visible;
 		public bool PartVisible { get => _visible; set { _visible = value; Notify(); } }
 
-		public ICommand LoadCommand { get; }
-		public ICommand AddCommand { get; }
+		public ICommand ReadCommand { get; }
+		public ICommand CreateCommand { get; }
 		public ICommand UpdateCommand { get; }
 		public ICommand DeleteCommand { get; }
+		public ICommand ClearCommand { get; }
 
-		public async Task LoadAsync()
+		public async Task ReadAsync()
 		{
 			Components.Clear();
 			var items = await _api.GetAllAsync();
@@ -54,7 +59,7 @@ namespace TechSupport.AdminApp.ViewModels
 				Components.Add(item);
 		}
 
-		public async Task AddAsync()
+		public async Task CreateAsync()
 		{
 			var dto = new ComponentDto
 			{
@@ -64,7 +69,7 @@ namespace TechSupport.AdminApp.ViewModels
 			};
 
 			await _api.CreateAsync(dto);
-			await LoadAsync();
+			await ReadAsync();
 			ClearFields();
 		}
 
@@ -77,7 +82,7 @@ namespace TechSupport.AdminApp.ViewModels
 			SelectedComponent.PartVisible = PartVisible;
 
 			await _api.UpdateAsync(SelectedComponent.PartId, SelectedComponent);
-			await LoadAsync();
+			await ReadAsync();
 		}
 
 		public async Task DeleteSelectedAsync()
@@ -86,12 +91,20 @@ namespace TechSupport.AdminApp.ViewModels
 
 			await _api.DeleteAsync(SelectedComponent.PartId);
 			SelectedComponent = null;
-			await LoadAsync();
+			await ReadAsync();
 			ClearFields();
+		}
+
+		public Task ClearAsync()
+		{
+			SelectedComponent = null;
+			ClearFields();
+			return Task.CompletedTask;
 		}
 
 		private void ClearFields()
 		{
+			PartId = 0;
 			PartName = string.Empty;
 			PartDescription = string.Empty;
 			PartVisible = false;
@@ -101,9 +114,17 @@ namespace TechSupport.AdminApp.ViewModels
 		{
 			if (SelectedComponent != null)
 			{
+				PartId = SelectedComponent.PartId;
 				PartName = SelectedComponent.PartName;
 				PartDescription = SelectedComponent.PartDescription;
 				PartVisible = SelectedComponent.PartVisible;
+			}
+			else
+			{
+				PartId = 0;
+				PartName = string.Empty;
+				PartDescription = string.Empty;
+				PartVisible = false;
 			}
 		}
 

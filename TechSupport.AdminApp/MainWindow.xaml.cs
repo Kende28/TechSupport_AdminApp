@@ -21,8 +21,8 @@ namespace TechSupport.AdminApp
 			InitializeComponent();
 			DataContext = _vm;
 
-			// Betöltéskor automatikusan lehívjuk a LoadAsync-t
-			Loaded += async (_, __) => await _vm.LoadAsync();
+			// Betöltéskor automatikusan lehívjuk a ReadAsync-t
+			Loaded += async (_, __) => await _vm.ReadAsync();
 		}
 	}
 }

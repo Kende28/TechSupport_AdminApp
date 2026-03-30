@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 using TechSupport.AdminApp.Models;
-using System.Net.Http.Json;
-using System.Text.Json.Serialization;
 
 namespace TechSupport.AdminApp.Services
 {
@@ -24,25 +21,31 @@ namespace TechSupport.AdminApp.Services
 
 		public async Task<List<ComponentDto>> GetAllAsync()
 		{
-			return await _http.GetFromJsonAsync<List<ComponentDto >>("http://localhost:3000/parts");
-		}
-		public async Task UpdateAsync(int id, ComponentDto dto)
-		{
-			string jsonstring = "{" + $"partName: {dto.PartName}, partDescription: {dto.PartDescription}, partVisible: {dto.PartVisible}" + "}";
-			await _http.PatchAsJsonAsync($"http://localhost:3000/parts/{id}", jsonstring);
+			var items = await _http.GetFromJsonAsync<List<ComponentDto>>("parts");
+			return items ?? new List<ComponentDto>();
 		}
 
+		public async Task<ComponentDto?> GetByIdAsync(int id)
+		{
+			return await _http.GetFromJsonAsync<ComponentDto>($"parts/{id}");
+		}
 
 		public async Task<bool> CreateAsync(ComponentDto dto)
 		{
-			var response = await _http.PostAsJsonAsync("http://localhost:3000/parts", dto);
+			var response = await _http.PostAsJsonAsync("parts", dto);
 			return response.IsSuccessStatusCode;
 		}
 
-
-		public async Task DeleteAsync(int id)
+		public async Task<bool> UpdateAsync(int id, ComponentDto dto)
 		{
-			await _http.DeleteAsync($"http://localhost:3000/parts/{id}");
+			var response = await _http.PutAsJsonAsync($"parts/{id}", dto);
+			return response.IsSuccessStatusCode;
+		}
+
+		public async Task<bool> DeleteAsync(int id)
+		{
+			var response = await _http.DeleteAsync($"parts/{id}");
+			return response.IsSuccessStatusCode;
 		}
 	}
 }
