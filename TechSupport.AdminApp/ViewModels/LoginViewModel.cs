@@ -9,7 +9,9 @@ namespace TechSupport.AdminApp.ViewModels
 {
 	public class LoginViewModel : INotifyPropertyChanged
 	{
-		private string _username;
+		private readonly UserApiClient _api = new();
+
+        private string _username;
 		public string Username { get => _username; set { _username = value; Notify(); } }
 
 		private string _password;
@@ -17,15 +19,18 @@ namespace TechSupport.AdminApp.ViewModels
 
 		public ICommand LoginCommand { get; }
 
-		public LoginViewModel()
+		public string AuthenticationToken { get; private set; }
+
+        public LoginViewModel()
 		{
 			LoginCommand = new RelayCommand(Login);
 		}
 
-		//🎵Fuck this shit I'm out🎵
-		private void Login(object obj)
+		private async void Login(object obj)
 		{
-			// DEMO LOGIN!!!!
+			//publikus elérhetésű AuthenticationToken-be kellene menteni a bejelentkezéskor kapott tokent
+			//AuthenticationToken = _api.LoginAsync(new LoginDto(Username, Password)).Result;
+
 			if ( Username == "admin" && Password == "1234")
 			{
 				MessageBox.Show("Login successful!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);

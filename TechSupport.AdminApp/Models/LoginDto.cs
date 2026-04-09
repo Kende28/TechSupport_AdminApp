@@ -8,7 +8,13 @@ namespace TechSupport.AdminApp.Models
 {
 	public class LoginDto
 	{
-		public string userEmailName { get; set; }
+        public LoginDto(string userEmailName, string userPassword)
+        {
+            this.userEmailName = userEmailName;
+            this.userPassword = userPassword;
+        }
+
+        public string userEmailName { get; set; }
 		public string userPassword { get; set; }
 	}
 }

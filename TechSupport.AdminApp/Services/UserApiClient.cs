@@ -25,10 +25,10 @@ namespace TechSupport.AdminApp.Services
 
 		}
 
-		public async Task<bool> LoginAsync(LoginDto dto)
+		public async Task<string> LoginAsync(LoginDto dto)
 		{
 			var response = await _http.PostAsJsonAsync("http://localhost:3000/auth/login", dto);
-			return response.IsSuccessStatusCode;
+			return response.ToString();
 		}
 	}
 }
