@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using TechSupport.AdminApp.Models;
@@ -7,69 +8,77 @@ using TechSupport.AdminApp.Services;
 
 namespace TechSupport.AdminApp.ViewModels
 {
-	public class LoginViewModel : INotifyPropertyChanged
-	{
-		private readonly UserApiClient _api = new();
+    // Bejelentkezés ablak ViewModel
+    public class LoginViewModel : INotifyPropertyChanged
+    {
+        // Backend felhasználói API
+        private readonly UserApiClient _api = new();
 
         private string _username;
-		public string Username { get => _username; set { _username = value; Notify(); } }
+        // Bejelentkezési felhasználónév
+        public string Username { get => _username; set { _username = value; Notify(); } }
 
-		private string _password;
-		public string Password { get => _password; set { _password = value; Notify(); } }
+        private string _password;
+        // Bejelentkezési jelszó
+        public string Password { get => _password; set { _password = value; Notify(); } }
 
-		public ICommand LoginCommand { get; }
+        // Bejelentkezés gomb paranccsa
+        public ICommand LoginCommand { get; }
 
-		public string AuthenticationToken { get; private set; }
+        // Sikeresen lekért autentikációs token
+        public string AuthenticationToken { get; private set; }
 
+        // ViewModel inicializálása
         public LoginViewModel()
-		{
-			LoginCommand = new RelayCommand(Login);
-		}
+        {
+            LoginCommand.Execute(LoginAsync(LoginWindow.GetWindow));
+        }
 
-		private async void Login(object obj)
-		{
-			//publikus elérhetésű AuthenticationToken-be kellene menteni a bejelentkezéskor kapott tokent
-			//AuthenticationToken = _api.LoginAsync(new LoginDto(Username, Password)).Result;
+        // Backend hitelesítés
+        private async Task LoginAsync(object obj)
+        {
+            // Beviteli mezők ellenőrzése
+            if (string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(Password))
+            {
+                MessageBox.Show("Please enter both username and password.", "Login required", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
 
-			if ( Username == "admin" && Password == "1234")
-			{
-				MessageBox.Show("Login successful!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+            try
+            {
+                // Backend API hívás
+                var loginResponse = await _api.LoginAsync(new LoginDto(Username, Password));
+                // Token és felhasználó adat mentése
+                AuthenticationToken = loginResponse.Token;
+                AppConfig.BearerToken = AuthenticationToken;
+                AppConfig.CurrentUserName = loginResponse.UserName ?? Username;
+                AppConfig.CurrentUserEmail = loginResponse.UserEmail ?? string.Empty;
 
-				// Megnyitjuk MainWindow-t
-				var mainWindow = new MainWindow();
-				mainWindow.Show();
+                MessageBox.Show("Login successful!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
 
-				// Bezárjuk login ablakot
-				if (obj is Window window)
-					window.Close();
-			}
-			else
-			{
-				MessageBox.Show("Invalid username or password", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-			}
-		}
+                // Fő ablak megnyitása
+                var mainWindow = new MainWindow();
+                mainWindow.Show();
 
-		public event PropertyChangedEventHandler PropertyChanged;
-		private void Notify([CallerMemberName] string propertyName = null)
-			=> PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-	}
+                // Bejelentkezés ablak bezárása
+                if (obj is Window window)
+                {
+                    window.Close();
+                }
 
-	public class RelayCommand : ICommand
-	{
-		private readonly Action<object> _execute;
-		private readonly Predicate<object> _canExecute;
+            }
+            catch (System.Net.Http.HttpRequestException)
+            {
+                MessageBox.Show("Login failed. Please check your username and password.", "Login failed", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch
+            {
+                MessageBox.Show("An unexpected error occurred during login.", "Login failed", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
 
-		public RelayCommand(Action<object> execute, Predicate<object> canExecute = null)
-		{
-			_execute = execute;
-			_canExecute = canExecute;
-		}
-
-		public bool CanExecute(object parameter) => _canExecute?.Invoke(parameter) ?? true;
-
-		public void Execute(object parameter) => _execute(parameter);
-
-		public event EventHandler CanExecuteChanged;
-		public void RaiseCanExecuteChanged() => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-	}
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void Notify([CallerMemberName] string propertyName = null)
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
 }

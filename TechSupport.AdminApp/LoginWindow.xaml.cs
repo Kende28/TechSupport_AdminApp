@@ -15,17 +15,20 @@ using TechSupport.AdminApp.ViewModels;
 
 namespace TechSupport.AdminApp
 {
+	// Bejelentkező ablak code-behind
 	public partial class LoginWindow : Window
 	{
+		// ViewModel bejelentkézéshez
 		private readonly LoginViewModel _vm = new();
 
+		// Ablak inicializálása
 		public LoginWindow()
 		{
 			InitializeComponent();
 			DataContext = _vm;
 		}
 
-		// PasswordBox Binding workaround(nemtudom magyarul most)
+		// Jelszó szinkronizálása (MVVM workaround)
 		private void PasswordSync(object sender, RoutedEventArgs e)
 		{
 			_vm.Password = PasswordBox.Password;

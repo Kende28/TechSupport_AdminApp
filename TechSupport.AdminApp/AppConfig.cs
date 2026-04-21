@@ -7,10 +7,20 @@ using System.Xml.Linq;
 
 namespace TechSupport.AdminApp
 {
-
-		public static class AppConfig
-	{
-		public static string ApiBaseUrl { get; } = "https://localhost:3000/";
-	}
+    // Globális alkalmazás beállítások és közös adatok
+    public static class AppConfig
+    {
+        // Backend API alap URL
+        public static string ApiBaseUrl { get; } = "http://localhost:3000/";
+        
+        // Bejelentkezéskor kapott hitelesítési token
+        public static string BearerToken { get; set; } = string.Empty;
+        
+        // Jelenlegi felhasználó név
+        public static string CurrentUserName { get; set; } = string.Empty;
+        
+        // Jelenlegi felhasználó email
+        public static string CurrentUserEmail { get; set; } = string.Empty;
+    }
 }
 

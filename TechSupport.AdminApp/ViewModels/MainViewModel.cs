@@ -3,30 +3,50 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
+using TechSupport.AdminApp;
 using TechSupport.AdminApp.Models;
 using TechSupport.AdminApp.Services;
 
 namespace TechSupport.AdminApp.ViewModels
 {
-	public class MainViewModel : INotifyPropertyChanged
-	{
-		private readonly PartApiClient _api = new();
+    // Főablak ViewModel - alkatrész CRUD kezeléshez
+    public class MainViewModel : INotifyPropertyChanged
+    {
+        // Backend alkatrész API
+        private readonly PartApiClient _api = new();
 
-		public MainViewModel()
-		{
-			Components = new ObservableCollection<ComponentDto>();
+        private string _statusMessage;
+        // Operáció és státusz üzenetek
+        public string StatusMessage { get => _statusMessage; set { _statusMessage = value; Notify(); } }
 
-			ReadCommand = new AsyncRelayCommand(ReadAsync);
-			CreateCommand = new AsyncRelayCommand(CreateAsync);
-			UpdateCommand = new AsyncRelayCommand(UpdateAsync);
-			DeleteCommand = new AsyncRelayCommand(DeleteSelectedAsync);
-			ClearCommand = new AsyncRelayCommand(ClearAsync);
-		}
+        private string _userName;
+        // Bejelentkezett felhasználó neve
+        public string UserName { get => _userName; set { _userName = value; Notify(); } }
 
-		public ObservableCollection<ComponentDto> Components { get; }
+        // ViewModel inicializálása
+        public MainViewModel()
+        {
+            // Alkatrész lista és parancsok
+            Components = new ObservableCollection<ComponentDto>();
 
-		private ComponentDto _selectedComponent;
+            ReadCommand = new AsyncRelayCommand(ReadAsync);
+            CreateCommand = new AsyncRelayCommand(CreateAsync);
+            UpdateCommand = new AsyncRelayCommand(UpdateAsync);
+            DeleteCommand = new AsyncRelayCommand(DeleteSelectedAsync);
+            ClearCommand = new AsyncRelayCommand(ClearAsync);
+            //LogoutCommand = new AsyncRelayCommand(LogoutAsync);
+
+            UserName = AppConfig.CurrentUserName;
+            StatusMessage = "Készen áll a műveletekre.";
+        }
+
+        // Alkatrészek listája
+        public ObservableCollection<ComponentDto> Components { get; }
+
+        // Kiválasztott alkatrész az adatrácsban
+        private ComponentDto _selectedComponent;
 		public ComponentDto SelectedComponent
 		{
 			get => _selectedComponent;
@@ -50,52 +70,122 @@ namespace TechSupport.AdminApp.ViewModels
 		public ICommand UpdateCommand { get; }
 		public ICommand DeleteCommand { get; }
 		public ICommand ClearCommand { get; }
+        public ICommand LogoutCommand { get; }
 
-		public async Task ReadAsync()
-		{
-			Components.Clear();
-			var items = await _api.GetAllAsync();
-			foreach (var item in items)
-				Components.Add(item);
-		}
+        public async Task ReadAsync()
+        {
+            StatusMessage = "Adatok betöltése...";
+            try
+            {
+                var items = await _api.GetAllAsync();
+                Components.Clear();
+                foreach (var item in items)
+                    Components.Add(item);
 
-		public async Task CreateAsync()
-		{
-			var dto = new ComponentDto
-			{
-				PartName = PartName,
-				PartDescription = PartDescription,
-				PartVisible = PartVisible,
-			};
+                StatusMessage = $"Lista frissítve ({Components.Count})";
+            }
+            catch (Exception)
+            {
+                StatusMessage = "Hiba történt az adatok lekérésekor.";
+            }
+        }
 
-			await _api.CreateAsync(dto);
-			await ReadAsync();
-			ClearFields();
-		}
+        public async Task CreateAsync()
+        {
+            if (string.IsNullOrWhiteSpace(PartName))
+            {
+                StatusMessage = "Az alkatrész név megadása kötelező.";
+                return;
+            }
 
-		public async Task UpdateAsync()
-		{
-			if (SelectedComponent == null) return;
+            var dto = new ComponentDto
+            {
+                PartName = PartName,
+                PartDescription = PartDescription,
+                PartVisible = PartVisible,
+            };
 
-			SelectedComponent.PartName = PartName;
-			SelectedComponent.PartDescription = PartDescription;
-			SelectedComponent.PartVisible = PartVisible;
+            try
+            {
+                var success = await _api.CreateAsync(dto);
+                StatusMessage = success ? "Alkatrész létrehozva." : "Az alkatrész létrehozása sikertelen.";
+            }
+            catch (Exception)
+            {
+                StatusMessage = "Hiba történt az alkatrész létrehozásakor.";
+            }
 
-			await _api.UpdateAsync(SelectedComponent.PartId, SelectedComponent);
-			await ReadAsync();
-		}
+            await ReadAsync();
+            ClearFields();
+        }
 
-		public async Task DeleteSelectedAsync()
-		{
-			if (SelectedComponent == null) return;
+        public async Task UpdateAsync()
+        {
+            if (SelectedComponent == null)
+            {
+                StatusMessage = "Nincs kiválasztott alkatrész a módosításhoz.";
+                return;
+            }
 
-			await _api.DeleteAsync(SelectedComponent.PartId);
-			SelectedComponent = null;
-			await ReadAsync();
-			ClearFields();
-		}
+            SelectedComponent.PartName = PartName;
+            SelectedComponent.PartDescription = PartDescription;
+            SelectedComponent.PartVisible = PartVisible;
 
-		public Task ClearAsync()
+            try
+            {
+                var success = await _api.UpdateAsync(SelectedComponent.PartId, SelectedComponent);
+                StatusMessage = success ? "Alkatrész módosítva." : "Az alkatrész módosítása sikertelen.";
+            }
+            catch (Exception)
+            {
+                StatusMessage = "Hiba történt az alkatrész módosításakor.";
+            }
+
+            await ReadAsync();
+        }
+
+        public async Task DeleteSelectedAsync()
+        {
+            if (SelectedComponent == null)
+            {
+                StatusMessage = "Nincs kiválasztott alkatrész a törléshez.";
+                return;
+            }
+
+            try
+            {
+                var success = await _api.DeleteAsync(SelectedComponent.PartId);
+                StatusMessage = success ? "Alkatrész törölve." : "Az alkatrész törlése sikertelen.";
+            }
+            catch (Exception)
+            {
+                StatusMessage = "Hiba történt az alkatrész törlésekor.";
+            }
+
+            SelectedComponent = null;
+            await ReadAsync();
+            ClearFields();
+        }
+
+        public async Task LogoutAsync(object obj)
+        {
+            AppConfig.BearerToken = string.Empty;
+            AppConfig.CurrentUserName = string.Empty;
+            AppConfig.CurrentUserEmail = string.Empty;
+            StatusMessage = "Kijelentkezés...";
+
+            var loginWindow = new LoginWindow();
+            loginWindow.Show();
+
+            if (obj is Window window)
+            {
+                window.Close();
+            }
+
+            await Task.CompletedTask;
+        }
+
+        public Task ClearAsync()
 		{
 			SelectedComponent = null;
 			ClearFields();

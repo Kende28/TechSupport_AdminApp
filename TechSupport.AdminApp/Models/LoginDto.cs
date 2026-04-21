@@ -6,15 +6,20 @@ using System.Threading.Tasks;
 
 namespace TechSupport.AdminApp.Models
 {
-	public class LoginDto
-	{
+    // Backend bejelentkezési kérés DTO
+    public class LoginDto
+    {
+        // Konstruktor hitelesítési adatokkal
         public LoginDto(string userEmailName, string userPassword)
         {
             this.userEmailName = userEmailName;
             this.userPassword = userPassword;
         }
 
+        // Email vagy felhasználónév
         public string userEmailName { get; set; }
-		public string userPassword { get; set; }
-	}
+        
+        // Felhasználó jelszava
+        public string userPassword { get; set; }
+    }
 }

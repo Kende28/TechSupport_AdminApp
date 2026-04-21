@@ -4,36 +4,51 @@
              xmlns:local="clr-namespace:TechSupport.AdminApp"
              StartupUri="LoginWindow.xaml">
 
-	<Application.Resources>
-		<!-- Globális színek -->
-		<SolidColorBrush x:Key="PrimaryColor" Color="Blue"/>
-		<SolidColorBrush x:Key="SecondaryColor" Color="white"/>
-		<SolidColorBrush x:Key="ErrorColor" Color="Red"/>
+    <Application.Resources>
+        <SolidColorBrush x:Key="PrimaryColor" Color="#0d6efd"/>
+        <SolidColorBrush x:Key="SecondaryColor" Color="#ffffff"/>
+        <SolidColorBrush x:Key="BackgroundColor" Color="#f8f9fa"/>
+        <SolidColorBrush x:Key="CardColor" Color="#ffffff"/>
+        <SolidColorBrush x:Key="TextPrimary" Color="#212529"/>
+        <SolidColorBrush x:Key="BorderColor" Color="#dee2e6"/>
 
-		<!-- Globális stílus a gombokhoz -->
-		<Style TargetType="Button">
-			<Setter Property="Background" Value="{StaticResource PrimaryColor}"/>
-			<Setter Property="Foreground" Value="White"/>
-			<Setter Property="Padding" Value="6,3"/>
-			<Setter Property="Margin" Value="2"/>
-			<Setter Property="FontWeight" Value="Bold"/>
-		</Style>
+        <Style TargetType="Window">
+            <Setter Property="Background" Value="{StaticResource BackgroundColor}"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+        </Style>
 
-		<!-- Globális stílus a TextBox-okhoz -->
-		<Style TargetType="TextBox">
-			<Setter Property="Margin" Value="0,0,0,8"/>
-			<Setter Property="Padding" Value="4"/>
-		</Style>
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource PrimaryColor}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="Margin" Value="4"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderBrush" Value="{StaticResource PrimaryColor}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
 
-		<!-- Globális stílus a PasswordBox-hoz -->
-		<Style TargetType="PasswordBox">
-			<Setter Property="Margin" Value="0,0,0,8"/>
-			<Setter Property="Padding" Value="4"/>
-		</Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Margin" Value="0,0,0,12"/>
+            <Setter Property="Padding" Value="8"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+        </Style>
 
-		<!-- Globális stílus a TextBlock-okhoz -->
-		<Style TargetType="TextBlock">
-			<Setter Property="Margin" Value="0,0,0,4"/>
-		</Style>
-	</Application.Resources>
+        <Style TargetType="PasswordBox">
+            <Setter Property="Margin" Value="0,0,0,12"/>
+            <Setter Property="Padding" Value="8"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+        </Style>
+
+        <Style TargetType="TextBlock">
+            <Setter Property="Margin" Value="0,0,0,8"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+        </Style>
+
+        <DropShadowEffect x:Key="CardShadow" BlurRadius="20" ShadowDepth="4" Opacity="0.12"/>
+    </Application.Resources>
 </Application>

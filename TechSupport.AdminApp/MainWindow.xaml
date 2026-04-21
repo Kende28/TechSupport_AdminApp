@@ -2,48 +2,86 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="TechSupport Admin"
-        Width="900" Height="500">
+        Width="1000" Height="600"
+        WindowStartupLocation="CenterScreen">
 
-	<Grid Margin="10">
-		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="2*"/>
-			<ColumnDefinition Width="3*"/>
-		</Grid.ColumnDefinitions>
+    <Grid Background="{StaticResource BackgroundColor}" Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
 
-		<!-- Form panel -->
-		<StackPanel>
-			<TextBlock Text="Component Management"
-                       FontWeight="Bold"
-                       FontSize="16"
-                       Margin="0,0,0,10"/>
+        <Grid Grid.Row="0" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Orientation="Vertical">
+                <TextBlock Text="TechSupport Admin Dashboard" FontSize="26" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" />
+                <TextBlock Text="Közös backend és adatbázis kezelése" Foreground="#6c757d" FontSize="13" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Grid.Column="1" VerticalAlignment="Center">
+                <TextBlock Text="Bejelentkezve:" VerticalAlignment="Center" Foreground="{StaticResource TextPrimary}" Margin="0,0,6,0" />
+                <TextBlock Text="{Binding UserName}" VerticalAlignment="Center" FontWeight="Bold" Foreground="{StaticResource PrimaryColor}" Margin="0,0,16,0" />
+                <Button Content="Kijelentkezés" Command="{Binding LogoutCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" Width="120" />
+            </StackPanel>
+        </Grid>
 
-			<TextBlock Text="PartId"/>
-			<TextBox Text="{Binding PartId}" IsReadOnly="True" Margin="0,0,0,8"/>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="3*" />
+            </Grid.ColumnDefinitions>
 
-			<TextBlock Text="PartName"/>
-			<TextBox Text="{Binding PartName, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,8"/>
+            <Border Background="{StaticResource CardColor}" CornerRadius="16" Padding="20" BorderBrush="{StaticResource BorderColor}" BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Alkatrész szerkesztés" FontSize="18" FontWeight="Bold" Margin="0,0,0,18" />
 
-			<TextBlock Text="PartDescription"/>
-			<TextBox Text="{Binding PartDescription, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,8"/>
+                    <TextBlock Text="Alkatrész ID" />
+                    <TextBox Text="{Binding PartId}" IsReadOnly="True" />
 
-			<TextBlock Text="PartVisible"/>
-			<CheckBox IsChecked="{Binding PartVisible, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,8"/>
+                    <TextBlock Text="Megnevezés" />
+                    <TextBox Text="{Binding PartName, UpdateSourceTrigger=PropertyChanged}" />
 
-			<StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-				<Button Content="Create" Command="{Binding CreateCommand}" Width="80" Margin="0,0,8,0"/>
-				<Button Content="Update" Command="{Binding UpdateCommand}" Width="80" Margin="0,0,8,0"/>
-				<Button Content="Delete" Command="{Binding DeleteCommand}" Width="80" Margin="0,0,8,0"/>
-				<Button Content="Clear" Command="{Binding ClearCommand}" Width="80" Margin="0,0,8,0"/>
-				<Button Content="Read" Command="{Binding ReadCommand}" Width="80"/>
-			</StackPanel>
-		</StackPanel>
+                    <TextBlock Text="Leírás" />
+                    <TextBox Text="{Binding PartDescription, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" Height="100" TextWrapping="Wrap" />
 
-		<!-- DataGrid -->
-		<DataGrid Grid.Column="1"
-                  ItemsSource="{Binding Components}"
-                  SelectedItem="{Binding SelectedComponent}"
-				  SelectionMode="Single"
-                  AutoGenerateColumns="True"
-                  Margin="10,0,0,0"/>
-	</Grid>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,12">
+                        <CheckBox IsChecked="{Binding PartVisible, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
+                        <TextBlock Text=" Látható" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,12,0,0">
+                        <Button Content="Létrehozás" Command="{Binding CreateCommand}" Width="110" Margin="0,0,8,0" />
+                        <Button Content="Módosítás" Command="{Binding UpdateCommand}" Width="110" Margin="0,0,8,0" />
+                        <Button Content="Törlés" Command="{Binding DeleteCommand}" Width="110" Margin="0,0,8,0" />
+                    </StackPanel>
+
+                    <Button Content="Frissítés" Command="{Binding ReadCommand}" Width="120" Margin="0,16,0,0" />
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="1" Background="{StaticResource CardColor}" CornerRadius="16" Padding="16" BorderBrush="{StaticResource BorderColor}" BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Alkatrész lista" FontSize="18" FontWeight="Bold" Margin="0,0,0,12" />
+                    <DataGrid ItemsSource="{Binding Components}"
+                              SelectedItem="{Binding SelectedComponent}"
+                              SelectionMode="Single"
+                              AutoGenerateColumns="True"
+                              CanUserAddRows="False"
+                              CanUserDeleteRows="False"
+                              HeadersVisibility="Column"
+                              RowBackground="#f8f9fa"
+                              AlternatingRowBackground="White"
+                              GridLinesVisibility="None"
+                              Margin="0,8,0,0" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Border Grid.Row="2" Background="{StaticResource CardColor}" CornerRadius="12" Padding="12" BorderBrush="{StaticResource BorderColor}" BorderThickness="1" Margin="0,16,0,0">
+            <TextBlock Text="{Binding StatusMessage}" Foreground="{StaticResource TextPrimary}" />
+        </Border>
+    </Grid>
 </Window>
