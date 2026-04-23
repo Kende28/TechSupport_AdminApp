@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Input;
 using TechSupport.AdminApp.Models;
 using TechSupport.AdminApp.Services;
+using TechSupport.AdminApp.Helpers;
 
 namespace TechSupport.AdminApp.ViewModels
 {
@@ -31,7 +32,8 @@ namespace TechSupport.AdminApp.ViewModels
         // ViewModel inicializálása
         public LoginViewModel()
         {
-            LoginCommand.Execute(LoginAsync(LoginWindow.GetWindow));
+            // Parancs hozzárendelése (aszinkron, paraméterként az ablakot kapja)
+            LoginCommand = new AsyncRelayCommand(LoginAsync);
         }
 
         // Backend hitelesítés

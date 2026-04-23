@@ -38,21 +38,24 @@ namespace TechSupport.AdminApp.Services
         // Összes alkatrész lehívása
         public async Task<List<ComponentDto>> GetAllAsync()
         {
-            var items = await _http.GetFromJsonAsync<List<ComponentDto>>("http://localhost:3000/parts");
+            // Ha szükséges, adhatsz meg Bearer tokent
+            SetAuthorizationHeader();
+            var items = await _http.GetFromJsonAsync<List<ComponentDto>>("parts");
             return items ?? new List<ComponentDto>();
         }
 
         // Egy alkatrész lehívása ID alapján
         public async Task<ComponentDto?> GetByIdAsync(int id)
         {
-            return await _http.GetFromJsonAsync<ComponentDto>($"http://localhost:3000/parts/{id}");
+            SetAuthorizationHeader();
+            return await _http.GetFromJsonAsync<ComponentDto>($"parts/{id}");
         }
 
         // Új alkatrész létrehozása (Bearer token szükséges)
         public async Task<bool> CreateAsync(ComponentDto dto)
         {
             SetAuthorizationHeader();
-            var response = await _http.PostAsJsonAsync("http://localhost:3000/parts", dto);
+            var response = await _http.PostAsJsonAsync("parts", dto);
             return response.IsSuccessStatusCode;
         }
 
@@ -60,7 +63,7 @@ namespace TechSupport.AdminApp.Services
         public async Task<bool> UpdateAsync(int id, ComponentDto dto)
         {
             SetAuthorizationHeader();
-            var response = await _http.PutAsJsonAsync($"http://localhost:3000/parts/{id}", dto);
+            var response = await _http.PutAsJsonAsync($"parts/{id}", dto);
             return response.IsSuccessStatusCode;
         }
 
@@ -68,7 +71,7 @@ namespace TechSupport.AdminApp.Services
         public async Task<bool> DeleteAsync(int id)
         {
             SetAuthorizationHeader();
-            var response = await _http.DeleteAsync($"http://localhost:3000/parts/{id}");
+            var response = await _http.DeleteAsync($"parts/{id}");
             return response.IsSuccessStatusCode;
         }
     }

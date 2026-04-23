@@ -25,7 +25,7 @@ namespace TechSupport.AdminApp.Services
         public async Task<LoginResponseDto> LoginAsync(LoginDto dto)
         {
             // POST kérés az auth/login végpontra
-            var response = await _http.PostAsJsonAsync("http://localhost:3000/auth/login", dto);
+            var response = await _http.PostAsJsonAsync("auth/login", dto);
             response.EnsureSuccessStatusCode();
             var loginResult = await response.Content.ReadFromJsonAsync<LoginResponseDto>();
             return loginResult ?? throw new InvalidOperationException("Failed to deserialize login response.");

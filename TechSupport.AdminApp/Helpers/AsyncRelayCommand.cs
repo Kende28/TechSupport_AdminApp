@@ -7,17 +7,24 @@ using System.Windows.Input;
 
 namespace TechSupport.AdminApp.Helpers
 {
-	// Aszinkron parancs megvalósítása WPF számára
+    // Aszinkron parancs megvalósítása WPF számára
+	// Támogatja mind paraméter nélküli, mind objektum paramétert fogadó aszinkron műveleteket
 	public class AsyncRelayCommand : ICommand
 	{
-		// Aszinkron feladat delegátum
-		private readonly Func<Task> _execute;
-		
+		// Egységesített delegátum, amely objektum paramétert fogad
+		private readonly Func<object, Task> _execute;
+
 		// Végrehajtás alatt van-e a parancs
 		private bool _isExecuting;
 
-		// Konstruktor aszinkron feladattal
+		// Konstruktor paraméter nélküli aszinkron feladattal
 		public AsyncRelayCommand(Func<Task> execute)
+		{
+			_execute = _ => execute();
+		}
+
+		// Konstruktor objektum paramétert fogadó aszinkron feladattal
+		public AsyncRelayCommand(Func<object, Task> execute)
 		{
 			_execute = execute;
 		}
@@ -33,7 +40,7 @@ namespace TechSupport.AdminApp.Helpers
 
 			try
 			{
-				await _execute();
+				await _execute(parameter);
 			}
 			finally
 			{

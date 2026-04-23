@@ -8,6 +8,7 @@ using System.Windows.Input;
 using TechSupport.AdminApp;
 using TechSupport.AdminApp.Models;
 using TechSupport.AdminApp.Services;
+using TechSupport.AdminApp.Helpers;
 
 namespace TechSupport.AdminApp.ViewModels
 {
@@ -31,12 +32,12 @@ namespace TechSupport.AdminApp.ViewModels
             // Alkatrész lista és parancsok
             Components = new ObservableCollection<ComponentDto>();
 
-            ReadCommand = new AsyncRelayCommand(ReadAsync);
-            CreateCommand = new AsyncRelayCommand(CreateAsync);
-            UpdateCommand = new AsyncRelayCommand(UpdateAsync);
-            DeleteCommand = new AsyncRelayCommand(DeleteSelectedAsync);
-            ClearCommand = new AsyncRelayCommand(ClearAsync);
-            //LogoutCommand = new AsyncRelayCommand(LogoutAsync);
+            ReadCommand = new AsyncRelayCommand(async _ => await ReadAsync());
+            CreateCommand = new AsyncRelayCommand(async _ => await CreateAsync());
+            UpdateCommand = new AsyncRelayCommand(async _ => await UpdateAsync());
+            DeleteCommand = new AsyncRelayCommand(async _ => await DeleteSelectedAsync());
+            ClearCommand = new AsyncRelayCommand(async _ => await ClearAsync());
+            LogoutCommand = new AsyncRelayCommand(LogoutAsync);
 
             UserName = AppConfig.CurrentUserName;
             StatusMessage = "Készen áll a műveletekre.";
@@ -223,34 +224,5 @@ namespace TechSupport.AdminApp.ViewModels
 			=> PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 	}
 
-	// AsyncRelayCommand
-	public class AsyncRelayCommand : ICommand
-	{
-		private readonly Func<Task> _execute;
-		private bool _isExecuting;
 
-		public AsyncRelayCommand(Func<Task> execute)
-		{
-			_execute = execute;
-		}
-
-		public bool CanExecute(object parameter) => !_isExecuting;
-
-		public async void Execute(object parameter)
-		{
-			_isExecuting = true;
-			OnCanExecuteChanged();
-
-			try { await _execute(); }
-			finally
-			{
-				_isExecuting = false;
-				OnCanExecuteChanged();
-			}
-		}
-
-		public event EventHandler CanExecuteChanged;
-		protected virtual void OnCanExecuteChanged()
-			=> CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-	}
 }

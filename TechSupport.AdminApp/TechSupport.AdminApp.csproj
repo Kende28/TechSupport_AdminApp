@@ -8,4 +8,17 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <!-- Ensure backend npm dependencies are installed before building the WPF app in Visual Studio -->
+  <Target Name="EnsureBackendDependencies" BeforeTargets="Build">
+    <Exec WorkingDirectory="$(MSBuildProjectDirectory)\..\TechSupport.Backend" Command="cmd /c if exist package.json (npm install)" Condition=" '$(OS)' == 'Windows_NT' "/>
+    <Exec WorkingDirectory="$(MSBuildProjectDirectory)\..\TechSupport.Backend" Command="bash -lc 'if [ -f package.json ]; then npm install; fi'" Condition=" '$(OS)' != 'Windows_NT' "/>
+  </Target>
+
+  <!-- Start backend automatically when running/debugging the WPF app from Visual Studio -->
+  <Target Name="StartBackendForDebug" BeforeTargets="Run;Debug">
+    <Message Text="Starting backend (TechSupport.Backend) before debug/run..." Importance="High" />
+    <Exec WorkingDirectory="$(MSBuildProjectDirectory)\..\TechSupport.Backend" Command="cmd /c start /B npm start" Condition=" '$(OS)' == 'Windows_NT' "/>
+    <Exec WorkingDirectory="$(MSBuildProjectDirectory)\..\TechSupport.Backend" Command="bash -lc 'npm start &>/dev/null & disown'" Condition=" '$(OS)' != 'Windows_NT' "/>
+  </Target>
+
 </Project>

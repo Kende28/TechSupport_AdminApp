@@ -1,208 +1,160 @@
-  TECHSUPPORT ADMIN APP - TELEPÍTÉSI ÉS INDÍTÁSI ÚTMUTATÓ
+TECHSUPPORT ADMIN APP - TELEPÍTÉSI ÉS INDÍTÁSI ÚTMUTATÓ
 
 ------------------------------------------------------------------------[MAGYAR]----------------------------------------------------------------------
 
 1. ELŐFELTÉTELEK
   • Visual Studio 2022 vagy újabb (Community verzió is megfelelő)
-  • .NET 6.0 SDK vagy újabb
-  • MySQL szerver (a backend kezel majd az adatbázist)
-  • Backend szerver: https://github.com/Atmerium/TechSupport_Backend
-  • Node.js és npm (ha a backendhez szükséges)
+  • .NET 8.0 SDK (projekt target: net8.0-windows)
+  • MySQL szerver (a backend használja az adatbázist)
+  • Node.js és npm (a backendhez és frontend dev szerverhez)
 
-2. PROJEKT LETÖLTÉSE GITHUB-RÓL
-  a) Git böngészőben navigálj ide:
-     https://github.com/Atmerium/TechSupport_AdminApp
+2. PROJEKT LETÖLTÉSE
+  a) Klónozd a repót:
+     git clone <repo-url>
+     cd <repo-folder>
 
-  b) Kattints a "Code" zöld gombra, kopipálj az HTTPS URL-t
+3. ADATBÁZIS LÉTREHOZÁSA
+  a) Hozd létre az adatbázist és táblákat a mellékelt SQL script futtatásával:
+     mysql -u root -p < TechSupport.Backend/init_db.sql
+  b) A script létrehozza a tech_support_db adatbázist és a szükséges táblákat (users, token, parts), valamint egy teszt admin felhasználót: admin / admin123
 
-  c) Nyiss meg egy terminálablakot a kód helyének közelében és futtasd:
-     git clone https://github.com/Atmerium/TechSupport_AdminApp.git
-     cd TechSupport_AdminApp-master
+4. BACKEND BEÁLLÍTÁS
+  a) Másold a mintafájlt és szerkeszd a kapcsolat beállításait:
+     cd TechSupport.Backend
+     copy .env.example .env    (Windows)
+     cp .env.example .env      (Linux/macOS)
+  b) Állítsd be a .env fájlban a DB_HOST, DB_USER, DB_PASSWORD, DB_NAME értékeket.
+  c) Telepítsd a függőségeket és indítsd el a backendet:
+     npm install
+     npm start
+  d) Ellenőrizd: http://localhost:3000/parts
 
-3. BACKEND BEÁLLÍTÁSA
-  a) Telepítsd a backend szervert (lásd: TechSupport_Backend README)
-  
-  b) Győződj meg, hogy a backend fut a 3000-es porton:
-     http://localhost:3000
-  
-  c) Ellenőrizd, hogy az auth/login és /parts végpontok működnek:
-     POST http://localhost:3000/auth/login
-     GET http://localhost:3000/parts
+5. FRONTEND (DEV) - opcionális
+  A mappában található egy Vite + React placeholder:
+     cd TechSupport.Frontend
+     npm install
+     npm run dev
+  A dev szerver alapértelmezett portja: 5173. A vite config proxyzza az /auth és /parts kéréseket a helyi backend-re.
 
-4. PROJEKT MEGNYITÁSA A VISUAL STUDIÓBAN
-  a) Nyisd meg a Visual Studiót
-  
-  b) File → Open → Project/Solution
-  
-  c) Navigálj az letöltött mappához és válaszd ki:
-     TechSupport.AdminApp.sln
+6. WPF KLIENS (AdminApp)
+  a) Nyisd meg a TechSupport.AdminApp.sln fájlt Visual Studio-ban (2022+).
+  b) Build → Build Solution (az MSBuild target megkísérli telepíteni a backend npm csomagjait, ha szükséges).
+  c) Futtatás (F5) — megnyílik a LoginWindow.
+  d) Bejelentkezés: admin / admin123 (init_db.sql-ben létrehozott teszt felhasználó)
 
-  d) Kattints "Open"
 
-5. MEGOLDÁS FORDÍTÁSA
-  a) Build → Build Solution (vagy Ctrl+Shift+B)
-  
-  b) Várj, amíg a fordítás befejeződik
-  
-  c) Ha hibák vannak, töltsd le az összes NuGet csomagot:
-     Tools → NuGet Package Manager → Package Manager Console
-     >> Update-Package
+7. JÓTANÁCSOK ÉS HIBAELHÁRÍTÁS
+  • Ha a kliens "Backend nem elérhető" hibát mutat, ellenőrizd, hogy a Node backend fut és a .env-ben megadott DB elérhető.
+  • Ha a DB csatlakozás hibát ad, ellenőrizd a .env beállításokat és futtasd újra az init_db.sql-t.
+  • Ha a WPF projekt target framework eltérő (.NET SDK hiányzik), telepítsd a .NET 8.0 SDK-t vagy állítsd vissza a projekt TargetFramework-et a telepített SDK-nak megfelelően.
 
-6. ALKALMAZÁS INDÍTÁSA (DEBUG MÓD)
-  a) Nyomj F5 vagy kattints Debug → Start Debugging
-  
-  b) Az alkalmazás megnyitja a LoginWindow ablakot
-  
-  c) Bejelentkezési adatok:
-     • E-mail/Felhasználónév: (a backend MySQL adatbázisban tárolt adatok)
-     • Jelszó: (a backend MySQL adatbázisban tárolt jelszó)
-  
-  d) Sikeres bejelentkezés után megnyílik a MainWindow
+------------------------------------------------------------------------[ÁTMENETI FÁJLOK, AMIKET ÁT KELL TENNI]-------------------------------------------
 
-7. HASZNÁLAT
-  a) Alkatrészek (Parts) listázása: Frissítés gomb
-  
-  b) Alkatrész létrehozása:
-     - Töltsd ki a megnevezést és leírást
-     - Jelöld be a "Látható" opcionálisan
-     - Kattints "Létrehozás"
-  
-  c) Alkatrész módosítása:
-     - Válassz egyet a listából
-     - Módosítsd az adatokat
-     - Kattints "Módosítás"
-  
-  d) Alkatrész törlése:
-     - Válassz egyet a listából
-     - Kattints "Törlés"
-  
-  e) Kijelentkezés:
-     - Kattints a "Kijelentkezés" gombra
+Ha a backendet, frontendet és az adatbázist máshová mozgatod a gépeden, másold át az alábbi ideiglenes fájlokat és végezd el a leírt manuális lépéseket, hogy az AdminApp csatlakozni tudjon:
 
-8. BACKEND ÖSSZEKÖTÉS
-  Az alkalmazás az AppConfig.cs fájlban definiált backend URL-t használja:
-  http://localhost:3000
-  
-  Ha máshol futna a backend, módosítsd az AppConfig.cs-ben:
-  public static string ApiBaseUrl { get; } = "http://localhost:xxxx/";
+- TechSupport.Backend/init_db.sql
+  - Importáld a MySQL szerverbe a sémát és a teszt admin felhasználót:
+    mysql -u root -p < init_db.sql
 
-9. HIBAELHÁRÍTÁS
-  a) "Backend nem elérhető":
-     - Ellenőrizd, hogy a Node.js backend szerver fut-e
-     - Nyisd meg böngészőben: http://localhost:3000/api
-  
-  b) "Bejelentkezési hiba":
-     - Győződj meg, hogy a MySQL adatbázis és a backend fut
-     - Ellenőrizd a felhasználó adatait az adatbázisban
-  
-  c) "Fordítási hibák":
-     - Töltsd le az összes NuGet csomagot
-     - Töröld az obj és bin mappákat
-     - Fordítsd újra
+- TechSupport.Backend/.env (vagy .env.example)
+  - Tartalmazza az adatbázis csatlakozási beállításokat (DB_HOST, DB_USER, DB_PASSWORD, DB_NAME) és a szerver portját.
+  - Helyezd el ezt a fájlt a backend új helyén és indítsd újra a backendet.
+
+- TechSupport.Backend/package.json
+  - Ha a backendet forrásból futtatod, tartsd meg a package.json-t a függőségek telepítéséhez (npm install).
+
+- TechSupport.Frontend/package.json és vite config (vite.config.ts)
+  - Ha a frontend fejlesztői szervert futtatod, frissítsd a proxy-t vagy az API alap URL-jét, hogy a mozgatott backendre mutasson.
+
+AdminApp csatlakoztatásának manuális lépései:
+1) Szerkeszd a TechSupport.AdminApp/AppConfig.cs fájlt -> ApiBaseUrl a backend alap URL-jére ( '/'-al végződjön), pl. "http://localhost:3000/" vagy "https://api.example.com/".
+2) Biztosítsd, hogy a backend engedélyezze a CORS-t a frontend origin számára (ha a frontend külön van), és fogadja a kéréseket az AdminApp hostjától.
+3) Importáld az init_db.sql-t egy elérhető adatbázisba és frissítsd a backend .env-jét ezekkel a DB hitelesítő adatokkal.
+4) Indítsd el a backend és frontend szolgáltatásokat az új helyükön.
+5) Buildeld és futtasd az AdminApp-ot (Visual Studio). Jelentkezz be normálisan, vagy teszteléshez állíts be érvényes tokent az AppConfig.BearerToken-be.
+
+Tesztelési példák:
+- Bejelentkezés (visszaad token-t):
+  curl -s -X POST "{API_BASE}auth/login" -H "Content-Type: application/json" -d '{"username":"admin","password":"admin123"}'
+- Alkatrészek listázása tokennel:
+  curl -s -H "Authorization: Bearer TOKEN" "{API_BASE}parts"
 
 
 ------------------------------------------------------------------------[ENGLISH]----------------------------------------------------------------------
 
 1. REQUIREMENTS
-  • Visual Studio 2022 or newer (Community edition is fine)
-  • .NET 6.0 SDK or newer
-  • MySQL Server (backend will manage the database)
-  • Backend Server: https://github.com/Atmerium/TechSupport_Backend
-  • Node.js and npm (if needed for backend)
+  • Visual Studio 2022 or newer
+  • .NET 8.0 SDK (project targets net8.0-windows)
+  • MySQL Server
+  • Node.js and npm
 
-2. DOWNLOADING THE PROJECT FROM GITHUB
-  a) Navigate to:
-     https://github.com/Atmerium/TechSupport_AdminApp
+2. CLONE THE REPOSITORY
+  git clone <repo-url>
+  cd <repo-folder>
 
-  b) Click the green "Code" button, copy the HTTPS URL
+3. CREATE THE DATABASE
+  Run the included SQL script to create the database and tables:
+  mysql -u root -p < TechSupport.Backend/init_db.sql
+  The script creates tech_support_db and tables (users, token, parts) and a sample admin user (admin / admin123).
 
-  c) Open terminal in your code location and run:
-     git clone https://github.com/Atmerium/TechSupport_AdminApp.git
-     cd TechSupport_AdminApp-master
+4. BACKEND SETUP
+  cd TechSupport.Backend
+  copy .env.example .env   (Windows)  OR  cp .env.example .env (Linux/macOS)
+  Edit .env with your DB connection values (DB_HOST, DB_USER, DB_PASSWORD, DB_NAME)
+  npm install
+  npm start
+  Check: http://localhost:3000/parts
 
-3. SETTING UP THE BACKEND
-  a) Install the backend server (see TechSupport_Backend README)
-  
-  b) Make sure the backend is running on port 3000:
-     http://localhost:3000
-  
-  c) Verify that auth/login and /parts endpoints work:
-     POST http://localhost:3000/auth/login
-     GET http://localhost:3000/parts
+5. FRONTEND (DEV) - optional
+  cd TechSupport.Frontend
+  npm install
+  npm run dev
+  The Vite dev server proxies /auth and /parts to the local backend.
 
-4. OPENING THE PROJECT IN VISUAL STUDIO
-  a) Open Visual Studio
-  
-  b) File → Open → Project/Solution
-  
-  c) Navigate to the downloaded folder and select:
-     TechSupport.AdminApp.sln
+6. WPF CLIENT (AdminApp)
+  Open TechSupport.AdminApp.sln in Visual Studio.
+  Build → Build Solution
+  Run (F5). Login window opens.
+  Login with admin / admin123
 
-  d) Click "Open"
+7. NOTES & TROUBLESHOOTING
+  • Ensure TechSupport.Backend/.env points to a reachable MySQL instance.
+  • If backend cannot access DB, check credentials and run init_db.sql manually.
+  • MSBuild targets try to run npm install and start the backend before debugging; you can still run backend manually.
 
-5. BUILDING THE SOLUTION
-  a) Build → Build Solution (or Ctrl+Shift+B)
-  
-  b) Wait for the build to complete
-  
-  c) If there are errors, restore all NuGet packages:
-     Tools → NuGet Package Manager → Package Manager Console
-     >> Update-Package
-
-6. RUNNING THE APPLICATION (DEBUG MODE)
-  a) Press F5 or click Debug → Start Debugging
-  
-  b) The application opens the LoginWindow
-  
-  c) Login credentials:
-     • Email/Username: (stored in backend MySQL database)
-     • Password: (stored in backend MySQL database)
-  
-  d) After successful login, MainWindow opens
-
-7. USAGE
-  a) List components: Click "Frissítés" (Refresh) button
-  
-  b) Create a component:
-     - Fill in the name and description
-     - Optionally check "Látható" (Visible)
-     - Click "Létrehozás" (Create)
-  
-  c) Edit a component:
-     - Select one from the list
-     - Modify the details
-     - Click "Módosítás" (Update)
-  
-  d) Delete a component:
-     - Select one from the list
-     - Click "Törlés" (Delete)
-  
-  e) Logout:
-     - Click the "Kijelentkezés" (Logout) button
-
-8. BACKEND CONNECTION
-  The application uses the backend URL defined in AppConfig.cs:
-  http://localhost:3000
-  
-  If your backend runs elsewhere, modify AppConfig.cs:
-  public static string ApiBaseUrl { get; } = "http://localhost:xxxx/";
-
-9. TROUBLESHOOTING
-  a) "Backend is not available":
-     - Check if the Node.js backend server is running
-     - Open in browser: http://localhost:3000/api
-  
-  b) "Login error":
-     - Ensure MySQL database and backend are running
-     - Verify user credentials in the database
-  
-  c) "Build errors":
-     - Restore all NuGet packages
-     - Delete obj and bin folders
-     - Rebuild the solution
-
-Version: 1.0
+Version: 1.1
 Last Updated: 2026-04-20
-Repository: https://github.com/Atmerium/TechSupport_AdminApp
-Backend: https://github.com/Atmerium/TechSupport_Backend
-Frontend: https://github.com/Atmerium/TechSupport_Frontend
+Repository: local workspace
+
+
+------------------------------------------------------------------------[TEMPORARY FILES TO MOVE]----------------------------------------------------
+
+If you moved the backend, frontend and database elsewhere on your machine, copy/move these temporary files and perform the manual steps below so the AdminApp can connect:
+
+- TechSupport.Backend/init_db.sql
+  - Import into your MySQL server to create the schema and a test admin user:
+    mysql -u root -p < init_db.sql
+
+- TechSupport.Backend/.env (or .env.example)
+  - Contains DB connection settings (DB_HOST, DB_USER, DB_PASSWORD, DB_NAME) and server port.
+  - Place this file next to the backend service in its new location and restart the backend.
+
+- TechSupport.Backend/package.json
+  - If you run the backend from source, keep package.json to install dependencies (npm install).
+
+- TechSupport.Frontend/package.json and vite config (vite.config.ts)
+  - If running the frontend dev server, update its proxy or base API URL to point to the moved backend.
+
+Manual steps for AdminApp to connect:
+1) Edit TechSupport.AdminApp/AppConfig.cs -> ApiBaseUrl to the backend base URL (must end with '/'), e.g. "http://localhost:3000/" or "https://api.example.com/".
+2) Ensure the backend exposes CORS for the frontend origin (if frontend is separate) and accepts requests from the AdminApp host.
+3) Import init_db.sql into a reachable DB instance and update the backend .env with those DB credentials.
+4) Start backend and frontend services in their new locations.
+5) Build and run the AdminApp (Visual Studio). Login normally or paste a valid token into AppConfig.BearerToken for testing.
+
+Testing examples:
+- Login (returns token):
+  curl -s -X POST "{API_BASE}auth/login" -H "Content-Type: application/json" -d '{"username":"admin","password":"admin123"}'
+- List parts with token:
+  curl -s -H "Authorization: Bearer TOKEN" "{API_BASE}parts"
+

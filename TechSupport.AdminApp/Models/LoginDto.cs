@@ -16,9 +16,10 @@ namespace TechSupport.AdminApp.Models
             this.userPassword = userPassword;
         }
 
+        // A backend a felhasználónév/jelszó kulcsokból ezen nevekre számít (kis-/nagybetű érzékeny)
         // Email vagy felhasználónév
         public string userEmailName { get; set; }
-        
+
         // Felhasználó jelszava
         public string userPassword { get; set; }
     }

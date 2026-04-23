@@ -11,6 +11,8 @@ namespace TechSupport.AdminApp
     public static class AppConfig
     {
         // Backend API alap URL
+        // Set this to your external backend base URL (must end with '/').
+        // If you run the backend locally (see README), the default is http://localhost:3000/
         public static string ApiBaseUrl { get; } = "http://localhost:3000/";
         
         // Bejelentkezéskor kapott hitelesítési token

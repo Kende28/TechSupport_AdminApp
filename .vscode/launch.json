@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch TechSupport.AdminApp",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "npm: install backend",
+      "program": "${workspaceFolder}/TechSupport.AdminApp/bin/Debug/net8.0-windows/TechSupport.AdminApp.exe",
+      "cwd": "${workspaceFolder}/TechSupport.AdminApp",
+      "console": "internalConsole"
+    }
+  ]
+}
